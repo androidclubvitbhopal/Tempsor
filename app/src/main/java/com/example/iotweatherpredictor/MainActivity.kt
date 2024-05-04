@@ -1,20 +1,13 @@
 package com.example.iotweatherpredictor
 
-import androidx.appcompat.app.AppCompatActivity
-import android.content.Context
 import android.content.res.AssetFileDescriptor
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.util.Log
-import android.view.inputmethod.EditorInfo
-import android.view.inputmethod.InputMethodManager
 import android.widget.Button
-import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import com.example.iotweatherpredictor.ml.WeatherPredictor
-
 import org.tensorflow.lite.Interpreter
 import java.io.FileInputStream
 import java.nio.ByteBuffer
@@ -24,79 +17,30 @@ import java.nio.channels.FileChannel
 class MainActivity : AppCompatActivity() {
 
     lateinit var predictBtn: Button
-    lateinit var tempEt: TextView
-    lateinit var humidEt: TextView
+    lateinit var tempTv: TextView
+    lateinit var humidTv: TextView
     lateinit var resultTv: TextView
     private lateinit var tflite: Interpreter
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         predictBtn = findViewById(R.id.predictBtn)
-        tempEt = findViewById(R.id.tempET)
-        humidEt = findViewById(R.id.humidET)
+        tempTv = findViewById(R.id.tempTV)
+        humidTv = findViewById(R.id.humidTV)
         resultTv = findViewById(R.id.resultTV)
-        tempEt.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-
-            }
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-
-            }
-
-            override fun afterTextChanged(s: Editable?) {
-
-            }
-        })
-
-        tempEt.setOnEditorActionListener { _, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_NEXT) {
-                humidEt.requestFocus()
-                true
-            } else {
-                false
-            }
-        }
-
-        humidEt.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-
-            }
-
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-
-            }
-
-            override fun afterTextChanged(s: Editable?) {
-
-            }
-
-        })
-
-        humidEt.setOnEditorActionListener { _, actionId, _ ->
-            if (actionId == EditorInfo.IME_ACTION_DONE) {
-                val inputMethodManager =
-                    getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                inputMethodManager.hideSoftInputFromWindow(humidEt.windowToken, 0)
-                humidEt.clearFocus()
-                true
-            } else {
-                false
-            }
-        }
 
         try {
             tflite = Interpreter(loadModelFile())
             predictBtn.setOnClickListener {
-                resultTv.text=null
-                val temp = tempEt.text.toString().trim()
-                val humidity = humidEt.text.toString().trim()
+                resultTv.text = null
+                val temp = tempTv.text.toString()
+                val humidity = tempTv.text.toString()
 
                 if (temp.isEmpty() || humidity.isEmpty()) {
                     // Toast message indicating that the fields are empty
                     Toast.makeText(
                         this,
-                        "Please enter both temperature and humidity",
+                        "Could not detect",
                         Toast.LENGTH_SHORT
                     ).show()
                 } else {
@@ -107,21 +51,21 @@ class MainActivity : AppCompatActivity() {
                         val weather = predictWeather(temperatureC, humidityPer)
                         resultTv.text = "Predicted Weather: " + weather
                         var weatherLogo = 0
-                        when(weather){
+                        when (weather) {
                             "Sunny" -> weatherLogo = R.drawable.sunny
                             "Cloudy" -> weatherLogo = R.drawable.cloudy
                             "Partly Cloudy" -> weatherLogo = R.drawable.partly_cloudy
                             "Rainy" -> weatherLogo = R.drawable.rainy
                             "Cold" -> weatherLogo = R.drawable.cold
                         }
-                        resultTv.setCompoundDrawablesWithIntrinsicBounds(0,weatherLogo,0,0)
+                        resultTv.setCompoundDrawablesWithIntrinsicBounds(0, weatherLogo, 0, 0)
                         // Releases model resources if no longer used.
                         model.close()
                     } catch (e: NumberFormatException) {
                         // Handles the case where the user entered a non-numeric value
                         Toast.makeText(
                             this,
-                            "Please enter valid numeric values for temperature and humidity",
+                            "Invalid values for temperature and humidity",
                             Toast.LENGTH_SHORT
                         ).show()
                     }
