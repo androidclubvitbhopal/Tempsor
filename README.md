@@ -32,7 +32,7 @@ Welcome new and full-of-energy developers for Android Development! This project 
 
 + All other minor dependencies are specified in the [build.gradle file](https://github.com/adsmehra/IOT-Weather-Predictor/blob/main/app/build.gradle.kts).
 
-## Dependencies for Tensor
+## Dependencies for TensorFlow
 
 ```python
     implementation("org.tensorflow:tensorflow-lite-support:0.1.0")
