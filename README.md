@@ -32,10 +32,26 @@ Welcome new and full-of-energy developers for Android Development! This project 
 
 + All other minor dependencies are specified in the [build.gradle file](https://github.com/adsmehra/IOT-Weather-Predictor/blob/main/app/build.gradle.kts).
 
-## Dependencies for TensorFlow
+## Dependencies 
+### For TensorFlow
 
 ```python
     implementation("org.tensorflow:tensorflow-lite-support:0.1.0")
     implementation("org.tensorflow:tensorflow-lite-metadata:0.1.0")
     implementation("org.tensorflow:tensorflow-lite-gpu:2.3.0")
+````
+
+### For Testing Framework in Java
+```python
+     testImplementation("junit:junit:4.13.2")
+````
+
+### For Testing Android in Java
+```python
+     androidTestImplementation("androidx.test.ext:junit:1.1.5")
+````
+
+### For testing framework for writing UI tests in Android applications
+```python
+     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
 ````
