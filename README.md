@@ -2,6 +2,9 @@
 
 This Android app fetches real-time temperature and humidity data from IoT devices via Azure Blob Storage and predicts weather conditions using a machine learning model, implemented with TensorFlow Lite.
 
+![Screenshot](https://github.com/adsmehra/IOT-Weather-Predictor/assets/64251955/85d9f6d5-62a5-4d4e-accc-a9cf3d0955d6 =250x)
+
+
 ## Prerequisites
 + Your PC should have Android Studio installed.
 + An Android Phone (or you may install and test the app on a virtual device)
@@ -30,6 +33,9 @@ This Android app fetches real-time temperature and humidity data from IoT device
 + Retrofit: For making network requests and handling REST API responses
 + Gson: For parsing JSON responses into Kotlin data classes
 + All other minor dependencies are specified in the [build.gradle file](https://github.com/adsmehra/IOT-Weather-Predictor/blob/main/app/build.gradle.kts).
+
+# UI XML File
+How your app looks is specified in the activity_main.xml [here](https://github.com/adsmehra/IOT-Weather-Predictor/blob/main/app/src/main/res/layout/activity_main.xml)
 
 # ML Part
 ## DATASET
@@ -283,5 +289,48 @@ private fun loadModelFile(): ByteBuffer {
 
 
 ```
+# Steps for Development
+
+![image](https://github.com/adsmehra/IOT-Weather-Predictor/assets/64251955/fe51a6c5-3204-4604-b9c9-77060d17b218)
+![image-1](https://github.com/adsmehra/IOT-Weather-Predictor/assets/64251955/c2dbdbe4-24bd-46c8-a6b0-2a6d6c852318)
+![image-2](https://github.com/adsmehra/IOT-Weather-Predictor/assets/64251955/f7c636ff-a385-4081-ad0f-b7943f5ab09e)
+![image-3](https://github.com/adsmehra/IOT-Weather-Predictor/assets/64251955/a9668393-2d3a-459b-bcef-4d48e4a823de)
+![image-4](https://github.com/adsmehra/IOT-Weather-Predictor/assets/64251955/518c8db1-8848-489c-819f-9955d98cbefb)
+![image-5](https://github.com/adsmehra/IOT-Weather-Predictor/assets/64251955/d7c1c19f-4d9c-4961-9b85-1e6e96615713)
+![image-6](https://github.com/adsmehra/IOT-Weather-Predictor/assets/64251955/76c55954-2f8c-4adb-9ff1-52da59ff1054)
+![image-7](https://github.com/adsmehra/IOT-Weather-Predictor/assets/64251955/d50bb9dd-e9e0-4f51-b05d-c247adb6e01b)
+![image-8](https://github.com/adsmehra/IOT-Weather-Predictor/assets/64251955/8156fb40-2f3a-482d-ac1c-7de1743ec21a)
+![image-9](https://github.com/adsmehra/IOT-Weather-Predictor/assets/64251955/7c08c1e6-67cb-4bd6-9161-1e7df224176b)
+![image-10](https://github.com/adsmehra/IOT-Weather-Predictor/assets/64251955/107ddd25-7ba5-4d41-91bd-7a6c3eaa8467)
+![image-11](https://github.com/adsmehra/IOT-Weather-Predictor/assets/64251955/23f1eb94-717d-4b39-b295-b711145c580d)
+![image-12](https://github.com/adsmehra/IOT-Weather-Predictor/assets/64251955/6683171d-20da-4c02-8466-dc885680eecb)
+![image-13](https://github.com/adsmehra/IOT-Weather-Predictor/assets/64251955/1e4450ea-2f59-4990-8581-a0817b5b1efe)
+![image-14](https://github.com/adsmehra/IOT-Weather-Predictor/assets/64251955/2cfe83cf-b286-42a1-a261-460b3ea8f491)
+![image-15](https://github.com/adsmehra/IOT-Weather-Predictor/assets/64251955/028fb20c-b373-4f08-9cc3-756130316721)
+![image-16](https://github.com/adsmehra/IOT-Weather-Predictor/assets/64251955/01968780-4615-4e9c-bdeb-267d36f9f370)
+![image-17](https://github.com/adsmehra/IOT-Weather-Predictor/assets/64251955/23c42523-0fa5-4a2d-b4da-a69962cfc463)
+![image-18](https://github.com/adsmehra/IOT-Weather-Predictor/assets/64251955/261c8e2c-a72f-41de-a20c-4391f860021b)
+![image-19](https://github.com/adsmehra/IOT-Weather-Predictor/assets/64251955/abf853a8-b5db-4579-a421-45e9cd5859f4)
+![image-20](https://github.com/adsmehra/IOT-Weather-Predictor/assets/64251955/188784b4-aee6-4dc8-a788-8b44c83fab20)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
