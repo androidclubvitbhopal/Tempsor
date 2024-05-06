@@ -35,7 +35,7 @@ class MainActivity : AppCompatActivity() {
         tempTv = findViewById(R.id.tempTV)
         humidTv = findViewById(R.id.humidTV)
         temptv=findViewById(R.id.tempTV)
-        humidTv=findViewById(R.id.humidTV)
+        humidtv=findViewById(R.id.humidTV)
         resultTv = findViewById(R.id.resultTV)
 
         val baseUrl = "https://sensor1data.blob.core.windows.net/onlinesensordata/"
