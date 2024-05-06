@@ -67,3 +67,6 @@ Espresso serves as a testing framework tailored for creating UI tests within And
 import org.tensorflow.lite.Interpreter
 ```
 
+
+# Weather-Predictor Model access
+You can get the model from "asset" section or follow the link -> https://github.com/adsmehra/IOT-Weather-Predictor/blob/main/app/src/main/assets/Weather_predictor.tflite
