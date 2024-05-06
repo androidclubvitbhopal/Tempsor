@@ -32,8 +32,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         predictBtn = findViewById(R.id.predictBtn)
-        tempTv = findViewById(R.id.tempTV)
-        humidTv = findViewById(R.id.humidTV)
         temptv=findViewById(R.id.tempTV)
         humidtv=findViewById(R.id.humidTV)
         resultTv = findViewById(R.id.resultTV)
@@ -57,8 +55,8 @@ class MainActivity : AppCompatActivity() {
                 temptv.text= temperatureC.toString()
                 humidtv.text=humidityPer.toString()
                 resultTv.text = null
-                val temp = tempTv.text.toString()
-                val humidity = tempTv.text.toString()
+                val temp = temptv.text.toString()
+                val humidity = humidtv.text.toString()
 
                 if (temp.isEmpty() || humidity.isEmpty()) {
                     // Toast message indicating that the fields are empty
@@ -155,17 +153,16 @@ class MainActivity : AppCompatActivity() {
         val byteBuffer =
             ByteBuffer.allocateDirect(2 * 4) // Assuming 2 input features and 4 bytes per float
         byteBuffer.order(ByteOrder.nativeOrder())
-        val floatBuffer = byteBuffer.asFloatBuffer()
-        floatBuffer.put(floatArrayOf(temperatureC, humidityPer))
+        val inputFeature0 = byteBuffer.asFloatBuffer()
+        inputFeature0.put(floatArrayOf(temp, humid))
         byteBuffer.rewind()
-
         // Creates inputs for reference.
-        val inputFeature0 =
-            ByteBuffer.allocateDirect(1 * 2 * 4).apply {
-                order(ByteOrder.nativeOrder())
-            }.asFloatBuffer().apply {
-                put(floatArrayOf(temperatureC, humidityPer))
-            }
+        // val inputFeature0 =
+        //     ByteBuffer.allocateDirect(1 * 2 * 4).apply {
+        //         order(ByteOrder.nativeOrder())
+        //     }.asFloatBuffer().apply {
+        //         put(floatArrayOf(temperatureC, humidityPer))
+        //     }
 
         // Runs model inference and gets result.
         val outputs = Array(1) { FloatArray(5) }
@@ -174,7 +171,6 @@ class MainActivity : AppCompatActivity() {
         val maxIndex = outputs[0].indices.maxByOrNull { outputs[0][it] } ?: -1
         val predictedClassIndex = if (maxIndex != -1) maxIndex else 0
 
-        //val predictedClassIndex = outputs[0].indexOf(outputs[0].maxOrNull() ?: 0f)
         val weatherConditions =
             arrayOf("Cloudy", "Cold", "Rainy", "Sunny", "Partly Cloudy")
         val predictedWeather = weatherConditions[predictedClassIndex]
