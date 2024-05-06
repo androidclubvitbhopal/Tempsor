@@ -49,8 +49,19 @@ This Android app fetches real-time temperature and humidity data from IoT device
 ## Import TensorFlow Interpreter
 ```kotlin
     import org.tensorflow.lite.Interpreter
+```
+
+# Weather-Predictor Model access
+You can get the model from "asset" section or follow the link -> [Tflite file](https://github.com/adsmehra/IOT-Weather-Predictor/blob/main/app/src/main/assets/Weather_predictor.tflite)
+
+## Import the ml file from the assets directory 
+```kotlin
     import com.example.demo.ml.WeatherPredictor
 ```
+
+## Flow diagram of the model
+![flow iot](https://github.com/adsmehra/IOT-Weather-Predictor/assets/64251955/fa75ef1b-2c70-4941-b041-cf6c83e6696f)
+
 ## Import Retrofit
 ```kotlin
     import retrofit2.Call
@@ -59,12 +70,6 @@ This Android app fetches real-time temperature and humidity data from IoT device
     import retrofit2.Retrofit
     import retrofit2.converter.gson.GsonConverterFactory
 ```
-
-# Weather-Predictor Model access
-You can get the model from "asset" section or follow the link -> [Tflite file](https://github.com/adsmehra/IOT-Weather-Predictor/blob/main/app/src/main/assets/Weather_predictor.tflite)
-
-## Flow diagram of the model
-![flow iot](https://github.com/adsmehra/IOT-Weather-Predictor/assets/64251955/fa75ef1b-2c70-4941-b041-cf6c83e6696f)
 
 # Code Snippets
 
@@ -172,6 +177,24 @@ Here, We:
 }
 
 ```
+
+### Loading Tensorflow model
++ Used to access the the tflite file from assets folder and create an inputstream for it
++ Creates a channel to pass the inputs to the model
++ Declares startOffset and length of the file
++ Returns a MappedByteBuffer for the data in the model
+  
+```kotlin
+private fun loadModelFile(): ByteBuffer {
+        val fileDescriptor: AssetFileDescriptor = assets.openFd("Weather_predictor.tflite")
+        val inputStream = FileInputStream(fileDescriptor.fileDescriptor)
+        val fileChannel = inputStream.channel
+        val startOffset = fileDescriptor.startOffset
+        val declareLength = fileDescriptor.declaredLength
+        return fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declareLength)
+    }
+```
+
 ### Predict Weather fun
 + Takes temperature (in Celsius) and humidity (in percentage) as inputs.
 + Uses a TensorFlow Lite model to predict the weather condition.
