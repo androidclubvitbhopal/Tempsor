@@ -83,7 +83,7 @@ Here, We:
 + Create variables for our cloud IOT data,
 + We then provide this data to our TFLite file for processing,
 + Throughout, we use Exception Handling to make sure we avoid errors.
-```
+```kotlin
 override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
