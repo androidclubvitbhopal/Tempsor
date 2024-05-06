@@ -9,6 +9,11 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.iotweatherpredictor.ml.WeatherPredictor
 import org.tensorflow.lite.Interpreter
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import java.io.FileInputStream
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -19,6 +24,8 @@ class MainActivity : AppCompatActivity() {
     lateinit var predictBtn: Button
     lateinit var tempTv: TextView
     lateinit var humidTv: TextView
+    lateinit var temptv: TextView
+    lateinit var humidtv: TextView
     lateinit var resultTv: TextView
     private lateinit var tflite: Interpreter
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -27,11 +34,28 @@ class MainActivity : AppCompatActivity() {
         predictBtn = findViewById(R.id.predictBtn)
         tempTv = findViewById(R.id.tempTV)
         humidTv = findViewById(R.id.humidTV)
+        temptv=findViewById(R.id.tempTV)
+        humidTv=findViewById(R.id.humidTV)
         resultTv = findViewById(R.id.resultTV)
+
+        val baseUrl = "https://sensor1data.blob.core.windows.net/onlinesensordata/"
+        val accKey =
+            "zin++eomthOe501JF2P7VJefVr646GhbuCMbqaMyMfdl59eH6n3fwIbGKzuzbnfyg61aRqE1cjsv+ASt5YbUjQ=="
+
+        val retrofit = Retrofit.Builder()
+            .baseUrl("$baseUrl?${accKey}")
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+        val service = retrofit.create(ApiService::class.java)
 
         try {
             tflite = Interpreter(loadModelFile())
             predictBtn.setOnClickListener {
+                var values:FloatArray=fetchData(service)
+                var temperatureC=values[0]
+                var humidityPer=values[1]
+                temptv.text= temperatureC.toString()
+                humidtv.text=humidityPer.toString()
                 resultTv.text = null
                 val temp = tempTv.text.toString()
                 val humidity = tempTv.text.toString()
@@ -77,6 +101,45 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this, "Failed to initialize model: ${ex.message}", Toast.LENGTH_SHORT)
                 .show()
         }
+    }
+
+    private fun fetchData(service: ApiService): FloatArray {
+        var tempFin=0.0f
+        var humidFin=0.0f
+        service.getSensorData().enqueue(object : Callback<List<SensorData>> {
+            override fun onResponse(
+                call: Call<List<SensorData>>,
+                response: Response<List<SensorData>>
+            ) {
+                if (response.isSuccessful) {
+                    val sensorDataList = response.body()
+                    if (!sensorDataList.isNullOrEmpty()) {
+                        val latestSensorData = sensorDataList[0]
+                        val temperature = latestSensorData.temperature
+                        val humidity = latestSensorData.humidity
+                        tempFin=temperature.toFloat()
+                        humidFin=humidity.toFloat()
+                        Log.d(
+                            "SensorData",
+                            "Temperature: $temperature, Humidity: $humidity"
+                        )
+                        Log.d("SensorData", "Temperature: $tempFin, Humidity: $humidFin")
+
+                    } else {
+                        Log.d("SensorData", "Sensor data list is null or empty")
+                    }
+
+                } else {
+                    Log.e("API Call", "Failed to fetch data: ${response.message()}")
+                }
+
+            }
+
+            override fun onFailure(call: Call<List<SensorData>>, t: Throwable) {
+                Log.e("API Call", "Failed to fetch data", t)
+            }
+        })
+        return floatArrayOf(tempFin, humidFin)
     }
 
     private fun loadModelFile(): ByteBuffer {
