@@ -35,7 +35,7 @@ This Android app fetches real-time temperature and humidity data from IoT device
 + All other minor dependencies are specified in the [build.gradle file](https://github.com/adsmehra/IOT-Weather-Predictor/blob/main/app/build.gradle.kts).
 
 # UI XML File
-How your app looks is specified in the activity_main.xml [here](https://github.com/adsmehra/IOT-Weather-Predictor/blob/main/app/src/main/res/layout/activity_main.xml)
+How your app looks is specified in the activity_main.xml [here](app/src/main/res/layout/activity_main.xml)
 
 # ML Part
 ## DATASET
