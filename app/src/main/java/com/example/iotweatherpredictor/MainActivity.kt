@@ -22,8 +22,6 @@ import java.nio.channels.FileChannel
 class MainActivity : AppCompatActivity() {
 
     lateinit var predictBtn: Button
-    lateinit var tempTv: TextView
-    lateinit var humidTv: TextView
     lateinit var temptv: TextView
     lateinit var humidtv: TextView
     lateinit var resultTv: TextView
@@ -154,15 +152,8 @@ class MainActivity : AppCompatActivity() {
             ByteBuffer.allocateDirect(2 * 4) // Assuming 2 input features and 4 bytes per float
         byteBuffer.order(ByteOrder.nativeOrder())
         val inputFeature0 = byteBuffer.asFloatBuffer()
-        inputFeature0.put(floatArrayOf(temp, humid))
+        inputFeature0.put(floatArrayOf(temperatureC, humidityPer))
         byteBuffer.rewind()
-        // Creates inputs for reference.
-        // val inputFeature0 =
-        //     ByteBuffer.allocateDirect(1 * 2 * 4).apply {
-        //         order(ByteOrder.nativeOrder())
-        //     }.asFloatBuffer().apply {
-        //         put(floatArrayOf(temperatureC, humidityPer))
-        //     }
 
         // Runs model inference and gets result.
         val outputs = Array(1) { FloatArray(5) }
