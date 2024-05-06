@@ -33,20 +33,26 @@ This Android app fetches real-time temperature and humidity data from IoT device
 
 ## Dependencies 
 ### For TensorFlow
-
 ```
     implementation("org.tensorflow:tensorflow-lite-support:0.1.0")
     implementation("org.tensorflow:tensorflow-lite-metadata:0.1.0")
     implementation("org.tensorflow:tensorflow-lite-gpu:2.3.0")
+
+````
+### For Retrofit and Gson
+```
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
     implementation 'com.google.code.gson:gson:2.8.8'
-````
 
+```
 ## Import TensorFlow Interpreter
 ```kotlin
     import org.tensorflow.lite.Interpreter
     import com.example.demo.ml.WeatherPredictor
+```
+## Import Retrofit
+```kotlin
     import retrofit2.Call
     import retrofit2.Callback
     import retrofit2.Response
@@ -106,7 +112,7 @@ Here, We:
 + We then provide this data to our TFLite file for processing,
 + Throughout, we use Exception Handling to make sure we avoid errors.
 
-## Retrofit Setup
+### Retrofit Setup
 + The following code initializes Retrofit with a base URL and an access key, creates a service for making API calls, and defines a method for fetching sensor data.
 ```kotlin
         val baseUrl = "https://sensor1data.blob.core.windows.net/onlinesensordata/"
@@ -120,7 +126,7 @@ Here, We:
         val service = retrofit.create(ApiService::class.java)
 ```
 
-## Fetch Data fun
+### Fetch Data fun
 + Makes an asynchronous API call using Retrofit's enqueue method.
 + Parses the response to extract the latest sensor data (temperature and humidity).
 + Returns a FloatArray containing the temperature and humidity values.
@@ -166,7 +172,7 @@ Here, We:
 }
 
 ```
-## Predict Weather fun
+### Predict Weather fun
 + Takes temperature (in Celsius) and humidity (in percentage) as inputs.
 + Uses a TensorFlow Lite model to predict the weather condition.
 + Returns the predicted weather condition (Sunny, Cloudy, Partly Cloudy, Rainy, Cold).
