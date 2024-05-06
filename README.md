@@ -35,8 +35,11 @@ This Android app fetches real-time temperature and humidity data from IoT device
 ## DATASET
 The data used for this model is a custom-made dataset built using python pandas. 
 The dataset used is **indian_weather_dataset3.csv**, which contains the following columns:
+
 •	**Temperature (°C)**
+
 •	**Humidity (%)**
+
 The sole reason for using such a simple dataset is because of its high interpretability. While using a large real-world dataset can improve the performance of our machine learning model and can help in making better predictions, the crux of this project is the integration of machine learning to Android applications. We the Android club expects the audience to learn the process through this event and bring even more complex ideas to life.
 
 ## MODEL DEVELOPMENT
