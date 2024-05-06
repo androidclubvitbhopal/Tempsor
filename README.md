@@ -208,7 +208,7 @@ Here, We:
 #### Retrofit Setup
 + The following code initializes Retrofit with a base URL and an access key, creates a service for making API calls, and defines a method for fetching sensor data.
 ```kotlin
-        val baseUrl = "YOUR_BASE_URL"
+        val baseUrl = "https://<YOUR_ACCOUNT_NAME>.blob.core.windows.net/<YOUR_BLOB_STORAGE_NAME>/"
         val accKey =
             "<YOUR_ACCOUNT_KEY>"
 
