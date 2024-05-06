@@ -2,6 +2,9 @@
 
 This Android app fetches real-time temperature and humidity data from IoT devices via Azure Blob Storage and predicts weather conditions using a machine learning model, implemented with TensorFlow Lite.
 
+![Screenshot](https://github.com/adsmehra/IOT-Weather-Predictor/assets/64251955/85d9f6d5-62a5-4d4e-accc-a9cf3d0955d6)
+
+
 ## Prerequisites
 + Your PC should have Android Studio installed.
 + An Android Phone (or you may install and test the app on a virtual device)
