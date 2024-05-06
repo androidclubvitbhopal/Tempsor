@@ -47,49 +47,7 @@ class MainActivity : AppCompatActivity() {
         try {
             tflite = Interpreter(loadModelFile())
             predictBtn.setOnClickListener {
-                var values:FloatArray=fetchData(service)
-                var temperatureC=values[0]
-                var humidityPer=values[1]
-                temptv.text= temperatureC.toString()
-                humidtv.text=humidityPer.toString()
-                resultTv.text = null
-                val temp = temptv.text.toString()
-                val humidity = humidtv.text.toString()
-
-                if (temp.isEmpty() || humidity.isEmpty()) {
-                    // Toast message indicating that the fields are empty
-                    Toast.makeText(
-                        this,
-                        "Could not detect",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                } else {
-                    try {
-                        val temperatureC = temp.toFloat()
-                        val humidityPer = humidity.toFloat()
-                        val model = WeatherPredictor.newInstance(this)
-                        val weather = predictWeather(temperatureC, humidityPer)
-                        resultTv.text = "Predicted Weather: " + weather
-                        var weatherLogo = 0
-                        when (weather) {
-                            "Sunny" -> weatherLogo = R.drawable.sunny
-                            "Cloudy" -> weatherLogo = R.drawable.cloudy
-                            "Partly Cloudy" -> weatherLogo = R.drawable.partly_cloudy
-                            "Rainy" -> weatherLogo = R.drawable.rainy
-                            "Cold" -> weatherLogo = R.drawable.cold
-                        }
-                        resultTv.setCompoundDrawablesWithIntrinsicBounds(0, weatherLogo, 0, 0)
-                        // Releases model resources if no longer used.
-                        model.close()
-                    } catch (e: NumberFormatException) {
-                        // Handles the case where the user entered a non-numeric value
-                        Toast.makeText(
-                            this,
-                            "Invalid values for temperature and humidity",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                }
+                fetchData(service)
             }
 
         } catch (ex: Exception) {
@@ -99,9 +57,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun fetchData(service: ApiService): FloatArray {
-        var tempFin=0.0f
-        var humidFin=0.0f
+    private fun fetchData(service: ApiService) {
         service.getSensorData().enqueue(object : Callback<List<SensorData>> {
             override fun onResponse(
                 call: Call<List<SensorData>>,
@@ -111,31 +67,26 @@ class MainActivity : AppCompatActivity() {
                     val sensorDataList = response.body()
                     if (!sensorDataList.isNullOrEmpty()) {
                         val latestSensorData = sensorDataList[0]
-                        val temperature = latestSensorData.temperature
-                        val humidity = latestSensorData.humidity
-                        tempFin=temperature.toFloat()
-                        humidFin=humidity.toFloat()
-                        Log.d(
-                            "SensorData",
-                            "Temperature: $temperature, Humidity: $humidity"
-                        )
-                        Log.d("SensorData", "Temperature: $tempFin, Humidity: $humidFin")
+                        val temperature = latestSensorData.temperature.toFloat()
+                        val humidity = latestSensorData.humidity.toFloat()
 
+                        temptv.text = temperature.toString()
+                        humidtv.text = humidity.toString()
+
+                        val weather = predictWeather(temperature, humidity)
+                        resultTv.text = weather
                     } else {
                         Log.d("SensorData", "Sensor data list is null or empty")
                     }
-
                 } else {
                     Log.e("API Call", "Failed to fetch data: ${response.message()}")
                 }
-
             }
 
             override fun onFailure(call: Call<List<SensorData>>, t: Throwable) {
                 Log.e("API Call", "Failed to fetch data", t)
             }
         })
-        return floatArrayOf(tempFin, humidFin)
     }
 
     private fun loadModelFile(): ByteBuffer {
