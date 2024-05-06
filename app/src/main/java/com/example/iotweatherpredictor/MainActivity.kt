@@ -74,7 +74,16 @@ class MainActivity : AppCompatActivity() {
                         humidtv.text = humidity.toString()
 
                         val weather = predictWeather(temperature, humidity)
-                        resultTv.text = weather
+                        var weatherIcon = 0
+                        when(weather){
+                            "Sunny" -> weatherIcon = R.drawable.sunny
+                            "Cloudy" -> weatherIcon = R.drawable.cloudy
+                            "Partly Cloudy" -> weatherIcon = R.drawable.partly_cloudy
+                            "Rainy" -> weatherIcon = R.drawable.rainy
+                            "Cold" -> weatherIcon = R.drawable.cold
+                        }
+                        resultTv.text = "Predicted Weather: \n" + weather
+                        resultTv.setCompoundDrawablesRelativeWithIntrinsicBounds(0,weatherIcon,0,0)
                     } else {
                         Log.d("SensorData", "Sensor data list is null or empty")
                     }
