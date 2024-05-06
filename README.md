@@ -62,8 +62,8 @@ This dependency extends JUnit to cater specifically to Android testing needs, of
 ````
 Espresso serves as a testing framework tailored for creating UI tests within Android apps. It enables developers to mimic user actions on the app's interface and confirm the app's proper functionality. This dependency encompasses the fundamental features of Espresso essential for crafting UI tests.
 
-## Import related to TensorFlow
-```
+## Import TensorFlow Interpreter
+```kotlin
 import org.tensorflow.lite.Interpreter
 ```
 
