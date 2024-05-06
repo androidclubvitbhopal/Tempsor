@@ -74,4 +74,88 @@ You can get the model from "asset" section or follow the link -> [Tflite file](h
 ## Flow diagram of the model
 ![flow iot](https://github.com/adsmehra/IOT-Weather-Predictor/assets/64251955/fa75ef1b-2c70-4941-b041-cf6c83e6696f)
 
+# Code Snippets
+
+## Main onCreate Method
+
+Here, We:
++ Initialize our UI Components,
++ Create variables for our cloud IOT data,
++ We then provide this data to our TFLite file for processing,
++ Throughout, we use Exception Handling to make sure we avoid errors.
+```
+override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+        predictBtn = findViewById(R.id.predictBtn)
+        temptv=findViewById(R.id.tempTV)
+        humidtv=findViewById(R.id.humidTV)
+        resultTv = findViewById(R.id.resultTV)
+
+        val baseUrl = "https://sensor1data.blob.core.windows.net/onlinesensordata/"
+        val accKey =
+            "zin++eomthOe501JF2P7VJefVr646GhbuCMbqaMyMfdl59eH6n3fwIbGKzuzbnfyg61aRqE1cjsv+ASt5YbUjQ=="
+
+        val retrofit = Retrofit.Builder()
+            .baseUrl("$baseUrl?${accKey}")
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+        val service = retrofit.create(ApiService::class.java)
+
+        try {
+            tflite = Interpreter(loadModelFile())
+            predictBtn.setOnClickListener {
+                var values:FloatArray=fetchData(service)
+                var temperatureC=values[0]
+                var humidityPer=values[1]
+                temptv.text= temperatureC.toString()
+                humidtv.text=humidityPer.toString()
+                resultTv.text = null
+                val temp = temptv.text.toString()
+                val humidity = humidtv.text.toString()
+
+                if (temp.isEmpty() || humidity.isEmpty()) {
+                    // Toast message indicating that the fields are empty
+                    Toast.makeText(
+                        this,
+                        "Could not detect",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                } else {
+                    try {
+                        val temperatureC = temp.toFloat()
+                        val humidityPer = humidity.toFloat()
+                        val model = WeatherPredictor.newInstance(this)
+                        val weather = predictWeather(temperatureC, humidityPer)
+                        resultTv.text = "Predicted Weather: " + weather
+                        var weatherLogo = 0
+                        when (weather) {
+                            "Sunny" -> weatherLogo = R.drawable.sunny
+                            "Cloudy" -> weatherLogo = R.drawable.cloudy
+                            "Partly Cloudy" -> weatherLogo = R.drawable.partly_cloudy
+                            "Rainy" -> weatherLogo = R.drawable.rainy
+                            "Cold" -> weatherLogo = R.drawable.cold
+                        }
+                        resultTv.setCompoundDrawablesWithIntrinsicBounds(0, weatherLogo, 0, 0)
+                        // Releases model resources if no longer used.
+                        model.close()
+                    } catch (e: NumberFormatException) {
+                        // Handles the case where the user entered a non-numeric value
+                        Toast.makeText(
+                            this,
+                            "Invalid values for temperature and humidity",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+            }
+
+        } catch (ex: Exception) {
+            ex.printStackTrace()
+            Toast.makeText(this, "Failed to initialize model: ${ex.message}", Toast.LENGTH_SHORT)
+                .show()
+        }
+    }
+```
+
 
