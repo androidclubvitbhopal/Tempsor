@@ -225,44 +225,46 @@ Here, We:
 + Returns a FloatArray containing the temperature and humidity values.
 
 ```kotlin
-    private fun fetchData(service: ApiService): FloatArray {
-    var tempFin=0.0f
-    var humidFin=0.0f
-    service.getSensorData().enqueue(object : Callback<List<SensorData>> {
-        override fun onResponse(
-            call: Call<List<SensorData>>,
-            response: Response<List<SensorData>>
-        ) {
-            if (response.isSuccessful) {
-                val sensorDataList = response.body()
-                if (!sensorDataList.isNullOrEmpty()) {
-                    val latestSensorData = sensorDataList[0]
-                    val temperature = latestSensorData.temperature
-                    val humidity = latestSensorData.humidity
-                    tempFin=temperature.toFloat()
-                    humidFin=humidity.toFloat()
-                    Log.d(
-                        "SensorData",
-                        "Temperature: $temperature, Humidity: $humidity"
-                    )
-                    Log.d("SensorData", "Temperature: $tempFin, Humidity: $humidFin")
+    private fun fetchData(service: ApiService) {
+        service.getSensorData().enqueue(object : Callback<List<SensorData>> {
+            override fun onResponse(
+                call: Call<List<SensorData>>,
+                response: Response<List<SensorData>>
+            ) {
+                if (response.isSuccessful) {
+                    val sensorDataList = response.body()
+                    if (!sensorDataList.isNullOrEmpty()) {
+                        val latestSensorData = sensorDataList[0]
+                        val temperature = latestSensorData.temperature.toFloat()
+                        val humidity = latestSensorData.humidity.toFloat()
 
+                        temptv.text = temperature.toString()
+                        humidtv.text = humidity.toString()
+
+                        val weather = predictWeather(temperature, humidity)
+                        var weatherIcon = 0
+                        when(weather){
+                            "Sunny" -> weatherIcon = R.drawable.sunny
+                            "Cloudy" -> weatherIcon = R.drawable.cloudy
+                            "Partly Cloudy" -> weatherIcon = R.drawable.partly_cloudy
+                            "Rainy" -> weatherIcon = R.drawable.rainy
+                            "Cold" -> weatherIcon = R.drawable.cold
+                        }
+                        resultTv.text = "Predicted Weather: \n" + weather
+                        resultTv.setCompoundDrawablesRelativeWithIntrinsicBounds(0,weatherIcon,0,0)
+                    } else {
+                        Log.d("SensorData", "Sensor data list is null or empty")
+                    }
                 } else {
-                    Log.d("SensorData", "Sensor data list is null or empty")
+                    Log.e("API Call", "Failed to fetch data: ${response.message()}")
                 }
-
-            } else {
-                Log.e("API Call", "Failed to fetch data: ${response.message()}")
             }
 
-        }
-
-        override fun onFailure(call: Call<List<SensorData>>, t: Throwable) {
-            Log.e("API Call", "Failed to fetch data", t)
-        }
-    })
-    return floatArrayOf(tempFin, humidFin)
-}
+            override fun onFailure(call: Call<List<SensorData>>, t: Throwable) {
+                Log.e("API Call", "Failed to fetch data", t)
+            }
+        })
+    }
 
 ```
 
