@@ -7,7 +7,6 @@ import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.example.iotweatherpredictor.ml.WeatherPredictor
 import org.tensorflow.lite.Interpreter
 import retrofit2.Call
 import retrofit2.Callback
@@ -26,6 +25,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var humidtv: TextView
     lateinit var resultTv: TextView
     private lateinit var tflite: Interpreter
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -42,22 +42,58 @@ class MainActivity : AppCompatActivity() {
             .baseUrl("$baseUrl?${accKey}")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
-        val service = retrofit.create(ApiService::class.java)
+        val service = retrofit.create(ApiService::class.java)       //Initialise Retrofit Service
 
         try {
-            tflite = Interpreter(loadModelFile())
+            tflite = Interpreter(loadModelFile())       //Initialise TfLite Model
             predictBtn.setOnClickListener {
-                fetchData(service)
+                var weatherData: Array<String>
+                fetchData(service){weatherInfo ->        //Use Data inside the callback
+                    weatherData = weatherInfo
+
+                    if (weatherData.size == 3){     //Verify Data as per Requirement
+                        updateUI(weatherData)        //Update UI
+                    }
+                    else{Toast.makeText(this,"Failed to load Data",Toast.LENGTH_SHORT).show()}
+                }
             }
 
-        } catch (ex: Exception) {
+        } catch (ex: Exception) {       //Handle Initialization Error
             ex.printStackTrace()
-            Toast.makeText(this, "Failed to initialize model: ${ex.message}", Toast.LENGTH_SHORT)
-                .show()
+            Toast.makeText(this, "Failed to initialize model: ${ex.message}", Toast.LENGTH_SHORT).show()
         }
     }
 
-    private fun fetchData(service: ApiService) {
+    private fun updateUI(weatherData: Array<String>){
+        //Get Data
+        val temperature = weatherData[0]
+        val humidity = weatherData[1]
+        val weather = weatherData[2]
+        val weatherIcon = when(weather) {
+            "Sunny" -> R.drawable.sunny
+            "Cloudy" -> R.drawable.cloudy
+            "Partly Cloudy" -> R.drawable.partly_cloudy
+            "Rainy" -> R.drawable.rainy
+            "Cold" -> R.drawable.cold
+            else -> 0
+        }
+
+        // Update UI on Separate Thread
+        runOnUiThread {
+            temptv.text = temperature
+            humidtv.text = humidity
+            resultTv.text = "Predicted Weather: \n$weather"
+            resultTv.setCompoundDrawablesRelativeWithIntrinsicBounds(0, weatherIcon, 0, 0)
+        }
+    }
+
+    private fun fetchData(service: ApiService, callback: (Array<String>) -> Unit) {
+        /*
+        callback function returns a String Array
+        FetchData is an Asynchronous Network Method,
+        Values cannot be used outside the function due to Network Latency,
+        We need to handle it inside the callback or in a subsequent asynchronous operation.
+        */
         service.getSensorData().enqueue(object : Callback<List<SensorData>> {
             override fun onResponse(
                 call: Call<List<SensorData>>,
@@ -66,39 +102,38 @@ class MainActivity : AppCompatActivity() {
                 if (response.isSuccessful) {
                     val sensorDataList = response.body()
                     if (!sensorDataList.isNullOrEmpty()) {
-                        val latestSensorData = sensorDataList[0]
+                        val latestSensorData = sensorDataList.last()        //Get Last Inserted data from Web JSON file
                         val temperature = latestSensorData.temperature.toFloat()
                         val humidity = latestSensorData.humidity.toFloat()
 
-                        temptv.text = temperature.toString()
-                        humidtv.text = humidity.toString()
+                        val weather = predictWeather(temperature, humidity)     //Predict Weather
 
-                        val weather = predictWeather(temperature, humidity)
-                        var weatherIcon = 0
-                        when(weather){
-                            "Sunny" -> weatherIcon = R.drawable.sunny
-                            "Cloudy" -> weatherIcon = R.drawable.cloudy
-                            "Partly Cloudy" -> weatherIcon = R.drawable.partly_cloudy
-                            "Rainy" -> weatherIcon = R.drawable.rainy
-                            "Cold" -> weatherIcon = R.drawable.cold
-                        }
-                        resultTv.text = "Predicted Weather: \n" + weather
-                        resultTv.setCompoundDrawablesRelativeWithIntrinsicBounds(0,weatherIcon,0,0)
-                    } else {
+                        val weatherInfo = arrayOf(temperature.toString(),humidity.toString(),weather)
+
+                        callback(weatherInfo)        //Return Values
+
+
+                    }
+                    //Handle Errors
+                    else {
                         Log.d("SensorData", "Sensor data list is null or empty")
+                        callback(arrayOf())
                     }
                 } else {
                     Log.e("API Call", "Failed to fetch data: ${response.message()}")
+                    callback(arrayOf())
                 }
             }
 
             override fun onFailure(call: Call<List<SensorData>>, t: Throwable) {
                 Log.e("API Call", "Failed to fetch data", t)
+                callback(arrayOf())
             }
         })
     }
 
     private fun loadModelFile(): ByteBuffer {
+        //Load TfLite Model from Assets Directory
         val fileDescriptor: AssetFileDescriptor = assets.openFd("Weather_predictor.tflite")
         val inputStream = FileInputStream(fileDescriptor.fileDescriptor)
         val fileChannel = inputStream.channel
@@ -111,24 +146,24 @@ class MainActivity : AppCompatActivity() {
         val byteBuffer =
             ByteBuffer.allocateDirect(2 * 4) // Assuming 2 input features and 4 bytes per float
         byteBuffer.order(ByteOrder.nativeOrder())
+
         val inputFeature0 = byteBuffer.asFloatBuffer()
         inputFeature0.put(floatArrayOf(temperatureC, humidityPer))
-        byteBuffer.rewind()
 
-        // Runs model inference and gets result.
-        val outputs = Array(1) { FloatArray(5) }
+        byteBuffer.rewind()     //Rewind Cursor to reading next value
+
+        val outputs = Array(1) { FloatArray(5) }        // Runs model inference and gets result.
         tflite.run(inputFeature0, outputs)
 
-        val maxIndex = outputs[0].indices.maxByOrNull { outputs[0][it] } ?: -1
+        val maxIndex = outputs[0].indices.maxByOrNull { outputs[0][it] } ?: -1      //Get Index Value for Predicted Weather
         val predictedClassIndex = if (maxIndex != -1) maxIndex else 0
 
         val weatherConditions =
-            arrayOf("Cloudy", "Cold", "Rainy", "Sunny", "Partly Cloudy")
+            arrayOf("Cloudy", "Cold", "Rainy", "Sunny", "Partly Cloudy")        //Default Set of Weather Data
         val predictedWeather = weatherConditions[predictedClassIndex]
         Log.d("Weather", "Predicted: $predictedClassIndex")
 
-        return predictedWeather
-
+        return predictedWeather     //Return Predicted Weather
     }
 
     override fun onDestroy() {
